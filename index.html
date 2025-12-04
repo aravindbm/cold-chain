@@ -115,6 +115,8 @@
 
 <script>
     /* --- DATA & CONFIG --- */
+    // PASTE YOUR GOOGLE DEPLOYMENT URL INSIDE THE QUOTES BELOW
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwW8_Bf7LEsGgL0lwb3t_IOG_tZKFgtg-xXVMAa3o0xTbPwZbx9T6ew4e1JvWWdQ_KV/exec";
     const STATIONS = [
         {
             id: 1,
@@ -484,14 +486,22 @@
     }
 
     function finishGame() {
+        // 1. Switch Screens
         document.getElementById('screen-game').classList.remove('active');
         document.getElementById('screen-report').classList.add('active');
         
-        document.getElementById('repName').textContent = document.getElementById('pName').value;
-        document.getElementById('repRoll').textContent = document.getElementById('pRoll').value;
+        // 2. Gather Data
+        const pName = document.getElementById('pName').value;
+        const pRoll = document.getElementById('pRoll').value;
+        const pTime = document.getElementById('timer').textContent;
+        
+        // 3. Update UI Report
+        document.getElementById('repName').textContent = pName;
+        document.getElementById('repRoll').textContent = pRoll;
         document.getElementById('finalScore').textContent = totalScore;
-        document.getElementById('repTime').textContent = document.getElementById('timer').textContent;
+        document.getElementById('repTime').textContent = pTime;
 
+        // Render detailed log table
         const logDiv = document.getElementById('log-container');
         let html = `<table style="width:100%; border-collapse:collapse; text-align:left; margin-top:20px;">
             <tr style="background:#ecf0f1;"><th>Station</th><th>Score</th><th>Status</th></tr>`;
@@ -504,9 +514,37 @@
             </tr>`;
         });
         html += `</table>`;
+        
+        // Add a Status Message area
+        html += `<p id="upload-status" style="margin-top:10px; font-weight:bold; color:gray;">Syncing results to cloud...</p>`;
         logDiv.innerHTML = html;
-    }
 
+        // 4. Send Data to Google Sheet
+        if(GOOGLE_SCRIPT_URL) {
+            const payload = {
+                name: pName,
+                roll: pRoll,
+                score: totalScore,
+                time: pTime
+            };
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors", // Essential for Google Scripts to accept data from external forms
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                document.getElementById('upload-status').innerText = "✅ Result successfully saved to Database.";
+                document.getElementById('upload-status').style.color = "green";
+            }).catch(err => {
+                console.error(err);
+                document.getElementById('upload-status').innerText = "⚠️ Saved locally, but cloud sync failed.";
+            });
+        }
+    }
 </script>
 </body>
 </html>
+
