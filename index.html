@@ -164,7 +164,7 @@
                     q: "Which of the following is a FREEZE DRIED (Lyophilized) vaccine?",
                     options: ["Pentavalent", "Hepatitis B", "BCG", "IPV"],
                     correct: 2,
-                    expl: "BCG is freeze dried (powder) and requires reconstitution."
+                    expl: "BCG is freeze dried (powder) and requires Normal Saline reconstitution."
                 }
             ]
         },
@@ -333,10 +333,15 @@
     /* --- TETRIS LOGIC --- */
     function renderTetris(stn, container) {
         let html = `
-        <p><strong>Instructions:</strong> Drag the vials into the ILR. <br>
-        <span style="color:var(--basket-color)">Top/Basket:</span> Freeze Sensitive (T-series, HepB).<br>
-        <span style="color:var(--floor-color)">Bottom/Floor:</span> Heat Sensitive (Live vaccines).</p>
+        <p><strong>Instructions:</strong> Drag the vials into the correct storage zone within the ILR based on their temperature sensitivity.</p>
         
+        <div style="margin-bottom: 10px;">
+            <span style="background:var(--basket-color); padding: 5px 10px; border-radius: 4px; font-weight:bold; margin-right: 10px;">
+                Top / Basket
+            </span>
+            <span style="background:var(--floor-color); padding: 5px 10px; border-radius: 4px; font-weight:bold;">
+                Bottom / Floor
+            </span>        
         <div class="vaccine-queue" id="v-queue"></div>
         
         <div class="ilr-diagram">
@@ -547,4 +552,5 @@
 </script>
 </body>
 </html>
+
 
