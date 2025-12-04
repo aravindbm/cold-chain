@@ -3,123 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mission: Cold Chain Guardian</title>
+    <title>Mission: Cold Chain Guardian Pro</title>
     <style>
         :root {
             --primary: #2c3e50;
-            --accent: #3498db;
+            --accent: #2980b9;
             --success: #27ae60;
             --danger: #c0392b;
+            --warning: #f39c12;
             --light: #ecf0f1;
-            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --basket-color: #d6eaf8; /* Top of ILR */
+            --floor-color: #aed6f1; /* Bottom of ILR */
         }
 
-        body {
-            font-family: var(--font-main);
-            background-color: #f4f7f6;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .container {
-            background: white;
-            width: 90%;
-            max-width: 800px;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        h1, h2 { color: var(--primary); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { background: white; width: 100%; max-width: 900px; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         
-        .header-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--light);
-            padding-bottom: 10px;
-        }
+        /* Headers & Utility */
+        h1, h2 { color: var(--primary); margin-top: 0; }
+        .header-bar { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--light); padding-bottom: 10px; margin-bottom: 20px; }
+        .timer { font-size: 1.2rem; font-weight: bold; color: var(--danger); background: #fadbd8; padding: 5px 15px; border-radius: 20px; }
+        .score-display { font-size: 1.2rem; font-weight: bold; color: var(--success); }
+        .btn { background-color: var(--accent); color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: 0.3s; display: inline-block; }
+        .btn:disabled { background-color: #95a5a6; cursor: not-allowed; }
+        .btn:hover:not(:disabled) { background-color: #1a5276; }
+        .screen { display: none; }
+        .active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .timer {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--danger);
-            background: #fadbd8;
-            padding: 5px 15px;
-            border-radius: 20px;
-        }
+        /* Login & Report */
+        input { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .report-score-box { text-align: center; padding: 20px; background: var(--primary); color: white; border-radius: 8px; margin-bottom: 20px; }
+        .report-score-big { font-size: 3rem; font-weight: bold; }
 
-        /* Input Forms */
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #bdc3c7;
-            border-radius: 5px;
-            font-size: 1rem;
-        }
+        /* Station Styles: MCQ */
+        .options-grid { display: grid; gap: 10px; }
+        .btn-option { text-align: left; background: white; color: var(--primary); border: 2px solid var(--light); width: 100%; }
+        .btn-option:hover { border-color: var(--accent); background: #ebf5fb; }
+        .feedback { margin-top: 15px; padding: 15px; border-radius: 6px; display: none; }
+        .feedback.good { background: #d4efdf; color: #145a32; border-left: 5px solid var(--success); }
+        .feedback.bad { background: #fadbd8; color: #7b241c; border-left: 5px solid var(--danger); }
 
-        /* Buttons */
-        .btn {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.3s;
-        }
-        .btn:hover { background-color: #2980b9; }
-        .btn-option {
-            width: 100%;
-            margin: 10px 0;
-            text-align: left;
-            background-color: white;
-            color: var(--primary);
-            border: 2px solid var(--light);
-        }
-        .btn-option:hover { border-color: var(--accent); background-color: #eaf2f8; }
+        /* Station 2: Matching Game */
+        .match-container { display: flex; gap: 20px; flex-wrap: wrap; }
+        .match-col { flex: 1; min-width: 250px; }
+        .draggable-item { background: var(--accent); color: white; padding: 10px; margin: 5px 0; border-radius: 4px; cursor: grab; }
+        .drop-target { background: #f8f9f9; border: 2px dashed #bdc3c7; padding: 15px; margin: 5px 0; border-radius: 4px; min-height: 40px; display: flex; align-items: center; justify-content: space-between; }
+        .drop-target.filled { border-style: solid; border-color: var(--success); background: #e8f8f5; }
 
-        /* Screens */
-        .screen { display: none; animation: fadeIn 0.5s; }
-        .active { display: block; }
-
-        /* Feedback Styles */
-        .feedback-box {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            display: none;
-        }
-        .feedback-correct { background-color: #d4efdf; color: #145a32; border-left: 5px solid var(--success); }
-        .feedback-wrong { background-color: #fadbd8; color: #7b241c; border-left: 5px solid var(--danger); }
-
-        /* Report Table */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background-color: var(--primary); color: white; }
+        /* Station 4: ILR Tetris */
+        .ilr-diagram { display: flex; flex-direction: column; height: 400px; border: 4px solid #5d6d7e; border-radius: 10px; margin-top: 20px; position: relative; }
+        .ilr-zone { flex: 1; padding: 10px; display: flex; flex-wrap: wrap; align-content: flex-start; gap: 10px; transition: 0.3s; }
+        .ilr-top { background: var(--basket-color); border-bottom: 2px dashed #abb2b9; position: relative; }
+        .ilr-top::after { content: "TOP / BASKET (Freeze Sensitive)"; position: absolute; right: 10px; top: 10px; font-size: 0.8rem; opacity: 0.5; font-weight: bold; }
+        .ilr-bottom { background: var(--floor-color); position: relative; }
+        .ilr-bottom::after { content: "BOTTOM / FLOOR (Heat Sensitive)"; position: absolute; right: 10px; bottom: 10px; font-size: 0.8rem; opacity: 0.5; font-weight: bold; }
         
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .vaccine-queue { display: flex; gap: 10px; padding: 15px; background: #eee; border-radius: 8px; overflow-x: auto; min-height: 60px; margin-bottom: 10px; }
+        .vial { width: 50px; height: 50px; background: white; border: 2px solid var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.7rem; cursor: grab; user-select: none; box-shadow: 2px 2px 5px rgba(0,0,0,0.2); }
+        .vial.correct { border-color: var(--success); background: #d4efdf; }
+        .vial.incorrect { border-color: var(--danger); background: #fadbd8; }
 
-        .objectives {
-            background: #e8f6f3;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-        }
     </style>
 </head>
 <body>
@@ -127,274 +71,442 @@
 <div class="container">
     
     <div id="screen-login" class="screen active">
-        <h1>Mission: Cold Chain Guardian</h1>
-        <div class="objectives">
-            <strong>Learning Objectives (CBME):</strong><br>
-            1. Define the Cold Chain system.<br>
-            2. Identify Cold Chain equipment functionality.<br>
-            3. Classify vaccines (Live/Killed) and Diluents.<br>
-            4. Demonstrate correct ILR storage positioning.<br>
-            5. Interpret the Shake Test for freeze damage.
+        <h1>Mission: Cold Chain Guardian Pro</h1>
+        <p><strong>Context:</strong> You are a Medical Officer managing the Cold Chain Point.</p>
+        <p><strong>Format:</strong> 5 Stations | Maximum Score: 100</p>
+        <hr>
+        <div style="margin-bottom: 20px;">
+            <label>Name</label> <input type="text" id="pName" placeholder="Candidate Name">
+            <label>Roll No</label> <input type="text" id="pRoll" placeholder="Roll Number">
         </div>
-        <div class="form-group">
-            <label>Student Name</label>
-            <input type="text" id="studentName" placeholder="Dr. Future">
-        </div>
-        <div class="form-group">
-            <label>Roll Number</label>
-            <input type="text" id="rollNo" placeholder="IMG-2025-001">
-        </div>
-        <button class="btn" onclick="startGame()">Start Simulation</button>
+        <button class="btn" onclick="initGame()">Start Assessment</button>
     </div>
 
     <div id="screen-game" class="screen">
         <div class="header-bar">
-            <span id="display-name">Student</span>
+            <span>Candidate: <strong id="dispName"></strong></span>
             <span class="timer" id="timer">00:00</span>
         </div>
         
-        <div id="question-container">
-            <h2 id="station-title">Station 1</h2>
-            <p id="question-text" style="font-size: 1.1rem; line-height: 1.5;">Question goes here...</p>
-            <div id="options-container"></div>
-        </div>
+        <div id="game-content">
+            </div>
 
-        <div id="feedback-display" class="feedback-box"></div>
-        <button id="next-btn" class="btn" style="display:none; margin-top:15px;" onclick="nextQuestion()">Proceed to Next Station</button>
+        <div id="feedback-area" class="feedback"></div>
+        <div style="text-align: right; margin-top: 20px;">
+            <button id="action-btn" class="btn" onclick="submitAnswer()">Submit Answer</button>
+        </div>
     </div>
 
     <div id="screen-report" class="screen">
-        <h1>Mission Report</h1>
-        <p><strong>Candidate:</strong> <span id="report-name"></span> (<span id="report-roll"></span>)</p>
-        <p><strong>Total Time:</strong> <span id="report-time"></span></p>
-        <p><strong>Final Score:</strong> <span id="report-score"></span> / 5</p>
+        <div class="report-score-box">
+            <div>FINAL SCORE</div>
+            <div class="report-score-big"><span id="finalScore">0</span>/100</div>
+        </div>
+        <h2>Performance Summary</h2>
+        <p><strong>Candidate:</strong> <span id="repName"></span> (<span id="repRoll"></span>)</p>
+        <p><strong>Time Taken:</strong> <span id="repTime"></span></p>
         
-        <h3>Performance Breakdown</h3>
-        <table id="report-table">
-            <thead>
-                <tr>
-                    <th>Station</th>
-                    <th>Result</th>
-                    <th>Educator's Note</th>
-                </tr>
-            </thead>
-            <tbody>
-                </tbody>
-        </table>
+        <div id="log-container"></div>
         <br>
-        <button class="btn" onclick="location.reload()">Restart Mission</button>
+        <button class="btn" onclick="location.reload()">Restart Assessment</button>
     </div>
 
 </div>
 
 <script>
-    // --- GAME DATA ---
-    const stations = [
+    /* --- DATA & CONFIG --- */
+    const STATIONS = [
         {
-            title: "Station 1: The Definition (Concepts)",
-            question: "You are explaining the Cold Chain to a new staff member. Complete the definition: 'The Cold Chain is a system of storing and transporting vaccines at recommended temperatures from the ________ to the ________.'",
-            options: [
-                "Laboratory -> Hospital Bed",
-                "Point of Manufacture -> Point of Use (Beneficiary)",
-                "State Store -> Sub-center"
-            ],
-            correctIndex: 1,
-            feedback: "Correct! The chain must remain unbroken from the factory all the way to the beneficiary's arm. A break anywhere compromises potency."
+            id: 1,
+            title: "Station 1: The Basics (Concept Check)",
+            type: "mcq",
+            pool: [
+                {
+                    q: "What is the recommended temperature range for the Ice Lined Refrigerator (ILR) at the PHC?",
+                    options: ["-15°C to -25°C", "+2°C to +8°C", "0°C to +4°C", "Room Temperature"],
+                    correct: 1,
+                    expl: "The standard storage temp for vaccines at PHC (ILR) is +2°C to +8°C."
+                },
+                {
+                    q: "The Cold Chain ends at which point?",
+                    options: ["The District Store", "The PHC ILR", "The Beneficiary", "The Vaccine Carrier"],
+                    correct: 2,
+                    expl: "The Cold Chain begins at manufacture and must be maintained until the vaccine enters the beneficiary."
+                }
+            ]
         },
         {
-            title: "Station 2: The Equipment (PHC Level)",
-            question: "You are at a Primary Health Center (PHC). You need to store the monthly stock of vaccines. Which equipment is the primary choice for STORAGE at the PHC?",
-            options: [
-                "Deep Freezer",
-                "Ice Lined Refrigerator (ILR)",
-                "Cold Box",
-                "Domestic Refrigerator"
-            ],
-            correctIndex: 1,
-            feedback: "Correct! The ILR is the backbone of the PHC cold chain. It maintains +2 to +8°C. The Deep Freezer at the PHC is mainly used for preparing ice packs."
+            id: 2,
+            title: "Station 2: The Equipment Room",
+            type: "match",
+            maxScore: 20,
+            items: [
+                { id: "ilr", label: "ILR", target: "Main storage at PHC (+2 to +8)" },
+                { id: "df", label: "Deep Freezer", target: "Preparation of Ice Packs" },
+                { id: "carrier", label: "Vaccine Carrier", target: "Carrying small qty to Sub-center" },
+                { id: "day", label: "Day Carrier", target: "Used for nearby sessions (2 vials)" }
+            ]
         },
         {
-            title: "Station 3: Diluent Logic",
-            question: "It is Immunization Day. You are reconstituting the BCG vaccine. Which diluent must you use?",
-            options: [
-                "Sterile Water",
-                "Phosphate Buffer Solution",
-                "Normal Saline (Sodium Chloride)",
-                "Distilled Water"
-            ],
-            correctIndex: 2,
-            feedback: "Spot on. BCG uses Normal Saline. (Remember: Measles uses Sterile Water; JE uses Phosphate Buffer). Never mix them up!"
+            id: 3,
+            title: "Station 3: The Vial Validator",
+            type: "mcq",
+            pool: [
+                {
+                    q: "You are reconstituting the MEASLES (MR) vaccine. Which diluent do you choose?",
+                    options: ["Normal Saline", "Phosphate Buffer", "Sterile Water", "Distilled Water"],
+                    correct: 2,
+                    expl: "Measles/MR always uses Sterile Water. (BCG uses Saline, JE uses Buffer)."
+                },
+                {
+                    q: "Which of the following is a FREEZE DRIED (Lyophilized) vaccine?",
+                    options: ["Pentavalent", "Hepatitis B", "BCG", "IPV"],
+                    correct: 2,
+                    expl: "BCG is freeze dried (powder) and requires reconstitution."
+                }
+            ]
         },
         {
-            title: "Station 4: ILR Positioning (The Tetris)",
-            question: "You have a shipment of PENTAVALENT vaccines. Where do you place them inside the Ice Lined Refrigerator (ILR)?",
-            options: [
-                "In the Basket (Top part)",
-                "On the Floor (Bottom part)",
-                "In the Freezer component"
-            ],
-            correctIndex: 0,
-            feedback: "Excellent. Pentavalent is a 'T-series' vaccine (Freeze Sensitive). It must be kept in the basket (Top) to avoid contact with the cold walls/bottom. The bottom is for heat-sensitive vaccines (OPV, Measles)."
+            id: 4,
+            title: "Station 4: ILR Tetris (Visual Sort)",
+            type: "tetris",
+            maxScore: 30, // High stakes
+            vials: [
+                { name: "Hep B", type: "freeze_sensitive" },
+                { name: "OPV", type: "heat_sensitive" },
+                { name: "Penta", type: "freeze_sensitive" },
+                { name: "Measles", type: "heat_sensitive" },
+                { name: "Td", type: "freeze_sensitive" },
+                { name: "BCG", type: "heat_sensitive" }
+            ]
         },
         {
-            title: "BONUS Station: The Shake Test",
-            question: "You suspect a vial of Td vaccine was frozen accidentally. You perform a Shake Test alongside a control vial. <br><br><strong>Observation:</strong> The suspect vial forms sediment FAST and the supernatant is CLEAR. The control vial settles SLOWLY and is CLOUDY.<br><br>What is your decision?",
-            options: [
-                "The vaccine is SAFE. Use it.",
-                "The vaccine is DAMAGED. Discard it.",
-                "Wait another 24 hours and re-test."
-            ],
-            correctIndex: 1,
-            feedback: "Correct decision. If the sediment settles faster than the control and leaves a clear liquid, the lattice structure is broken by freezing. Potency is lost. Discard immediately."
+            id: 5,
+            title: "Station 5: The Shake Test (Quality Control)",
+            type: "mcq",
+            pool: [
+                {
+                    q: "Shake Test Result: The suspect vial settles FASTER than the control vial, and the fluid is CLEAR. Conclusion?",
+                    options: ["Passed: Use Vaccine", "Failed: Discard Vaccine", "Indeterminate: Retest"],
+                    correct: 1,
+                    expl: "Fast settling + Clear supernatant = Frozen/Damaged. Discard."
+                },
+                {
+                    q: "Shake Test Result: The suspect vial settles SLOWER than the control vial, and the fluid is CLOUDY. Conclusion?",
+                    options: ["Passed: Use Vaccine", "Failed: Discard Vaccine", "Indeterminate: Retest"],
+                    correct: 0,
+                    expl: "Slow settling + Cloudy = Not frozen. Safe to use."
+                }
+            ]
         }
     ];
 
-    // --- STATE VARIABLES ---
-    let currentStation = 0;
-    let score = 0;
+    /* --- STATE --- */
+    let currentStnIndex = 0;
+    let totalScore = 0;
     let startTime;
-    let endTime;
-    let userLog = []; // Stores { question, status, note }
+    let activeQuestion = null; // Holds the specific random Q chosen
+    let actionLogs = [];
 
-    // --- DOM ELEMENTS ---
-    const screens = {
-        login: document.getElementById('screen-login'),
-        game: document.getElementById('screen-game'),
-        report: document.getElementById('screen-report')
-    };
-    const timerEl = document.getElementById('timer');
+    /* --- INIT --- */
+    function initGame() {
+        const n = document.getElementById('pName').value;
+        const r = document.getElementById('pRoll').value;
+        if(!n || !r) { alert("Please identify yourself."); return; }
+        
+        document.getElementById('dispName').textContent = n;
+        document.getElementById('screen-login').classList.remove('active');
+        document.getElementById('screen-game').classList.add('active');
+        
+        startTime = new Date();
+        setInterval(() => {
+            const now = new Date();
+            const diff = Math.floor((now - startTime)/1000);
+            const m = Math.floor(diff/60).toString().padStart(2,'0');
+            const s = (diff%60).toString().padStart(2,'0');
+            document.getElementById('timer').textContent = `${m}:${s}`;
+        }, 1000);
 
-    // --- FUNCTIONS ---
-
-    function showScreen(screenName) {
-        Object.values(screens).forEach(s => s.classList.remove('active'));
-        screens[screenName].classList.add('active');
+        loadStation();
     }
 
-    function startGame() {
-        const name = document.getElementById('studentName').value;
-        const roll = document.getElementById('rollNo').value;
+    /* --- RENDER LOGIC --- */
+    function loadStation() {
+        const stn = STATIONS[currentStnIndex];
+        const container = document.getElementById('game-content');
+        const feedback = document.getElementById('feedback-area');
+        const btn = document.getElementById('action-btn');
+        
+        container.innerHTML = `<h2>${stn.title}</h2>`;
+        feedback.style.display = 'none';
+        feedback.className = 'feedback';
+        btn.textContent = "Submit Answer";
+        btn.onclick = submitAnswer;
+        btn.style.display = 'inline-block';
 
-        if(!name || !roll) {
-            alert("Please enter Name and Roll Number to proceed.");
+        // LOGIC BRANCHING
+        if (stn.type === "mcq") {
+            renderMCQ(stn, container);
+        } else if (stn.type === "match") {
+            renderMatch(stn, container);
+        } else if (stn.type === "tetris") {
+            renderTetris(stn, container);
+        }
+    }
+
+    function renderMCQ(stn, container) {
+        // Pick random Q
+        const qIndex = Math.floor(Math.random() * stn.pool.length);
+        activeQuestion = stn.pool[qIndex];
+        
+        let html = `<p style="font-size:1.2rem">${activeQuestion.q}</p><div class="options-grid">`;
+        activeQuestion.options.forEach((opt, i) => {
+            html += `<button class="btn btn-option" onclick="selectOption(this, ${i})">${opt}</button>`;
+        });
+        html += `</div>`;
+        container.innerHTML += html;
+    }
+
+    let selectedOptionIndex = -1;
+    function selectOption(btn, index) {
+        if(document.getElementById('feedback-area').style.display === 'block') return; // Locked
+        document.querySelectorAll('.btn-option').forEach(b => b.style.borderColor = '#ecf0f1');
+        btn.style.borderColor = '#2980b9';
+        selectedOptionIndex = index;
+    }
+
+    /* --- MATCHING LOGIC --- */
+    function renderMatch(stn, container) {
+        let html = `<p>Drag the equipment (Blue) to its correct function description.</p>
+        <div class="match-container">
+            <div class="match-col" id="source-col">
+                </div>
+            <div class="match-col" id="target-col">
+                </div>
+        </div>`;
+        container.innerHTML += html;
+
+        // Shuffle items
+        const shuffledItems = [...stn.items].sort(() => Math.random() - 0.5);
+        const shuffledTargets = [...stn.items].sort(() => Math.random() - 0.5);
+
+        const srcDiv = document.getElementById('source-col');
+        const tgtDiv = document.getElementById('target-col');
+
+        shuffledItems.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'draggable-item';
+            el.draggable = true;
+            el.textContent = item.label;
+            el.id = item.id;
+            el.ondragstart = (ev) => { ev.dataTransfer.setData("text", ev.target.id); };
+            srcDiv.appendChild(el);
+        });
+
+        shuffledTargets.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'drop-target';
+            el.dataset.correctId = item.id; // Secretly store correct answer
+            el.innerHTML = `<span>${item.target}</span> <span class="slot">___</span>`;
+            el.ondragover = (ev) => ev.preventDefault();
+            el.ondrop = dropMatch;
+            tgtDiv.appendChild(el);
+        });
+    }
+
+    function dropMatch(ev) {
+        ev.preventDefault();
+        const data = ev.dataTransfer.getData("text");
+        const draggedEl = document.getElementById(data);
+        // Find closest drop target
+        const targetEl = ev.target.closest('.drop-target');
+        
+        if (targetEl && !targetEl.dataset.filled) {
+            targetEl.querySelector('.slot').textContent = draggedEl.textContent;
+            targetEl.dataset.filled = data; // Store the ID of what was dropped
+            draggedEl.style.display = 'none'; // Hide original
+        }
+    }
+
+    /* --- TETRIS LOGIC --- */
+    function renderTetris(stn, container) {
+        let html = `
+        <p><strong>Instructions:</strong> Drag the vials into the ILR. <br>
+        <span style="color:var(--basket-color)">Top/Basket:</span> Freeze Sensitive (T-series, HepB).<br>
+        <span style="color:var(--floor-color)">Bottom/Floor:</span> Heat Sensitive (Live vaccines).</p>
+        
+        <div class="vaccine-queue" id="v-queue"></div>
+        
+        <div class="ilr-diagram">
+            <div class="ilr-zone ilr-top" id="zone-top" ondragover="allowDrop(event)" ondrop="dropTetris(event, 'top')"></div>
+            <div class="ilr-zone ilr-bottom" id="zone-bottom" ondragover="allowDrop(event)" ondrop="dropTetris(event, 'bottom')"></div>
+        </div>`;
+        container.innerHTML += html;
+
+        const queue = document.getElementById('v-queue');
+        stn.vials.forEach((v, i) => {
+            const el = document.createElement('div');
+            el.className = 'vial';
+            el.draggable = true;
+            el.textContent = v.name;
+            el.id = `vial-${i}`;
+            el.dataset.type = v.type;
+            el.ondragstart = (ev) => {
+                ev.dataTransfer.setData("id", el.id);
+                ev.dataTransfer.setData("type", v.type);
+            };
+            queue.appendChild(el);
+        });
+    }
+
+    function allowDrop(ev) { ev.preventDefault(); }
+    
+    function dropTetris(ev, zone) {
+        ev.preventDefault();
+        const id = ev.dataTransfer.getData("id");
+        const type = ev.dataTransfer.getData("type");
+        const el = document.getElementById(id);
+        
+        // Visual Logic
+        el.style.position = 'relative'; // Reset
+        ev.target.appendChild(el);
+        
+        // Store user choice on the element
+        el.dataset.userChoice = zone; 
+    }
+
+    /* --- SUBMISSION ENGINE --- */
+    function submitAnswer() {
+        const stn = STATIONS[currentStnIndex];
+        const feedback = document.getElementById('feedback-area');
+        const btn = document.getElementById('action-btn');
+        
+        if(btn.textContent === "Next Station") {
+            nextStation();
             return;
         }
-
-        document.getElementById('display-name').textContent = name;
-        showScreen('game');
-        startTime = new Date();
-        setInterval(updateTimer, 1000);
-        loadQuestion();
-    }
-
-    function updateTimer() {
-        const now = new Date();
-        const diff = Math.floor((now - startTime) / 1000);
-        const min = Math.floor(diff / 60).toString().padStart(2, '0');
-        const sec = (diff % 60).toString().padStart(2, '0');
-        timerEl.textContent = `${min}:${sec}`;
-    }
-
-    function loadQuestion() {
-        const data = stations[currentStation];
-        document.getElementById('station-title').textContent = data.title;
-        document.getElementById('question-text').innerHTML = data.question;
         
-        const optsContainer = document.getElementById('options-container');
-        optsContainer.innerHTML = ''; // Clear previous
+        let scoreGain = 0;
+        let msg = "";
+        let isPass = false;
 
-        data.options.forEach((opt, index) => {
-            const btn = document.createElement('button');
-            btn.className = 'btn btn-option';
-            btn.textContent = opt;
-            btn.onclick = () => checkAnswer(index, btn);
-            optsContainer.appendChild(btn);
+        // --- MCQ CHECK ---
+        if (stn.type === "mcq") {
+            if(selectedOptionIndex === -1) { alert("Select an option."); return; }
+            if(selectedOptionIndex === activeQuestion.correct) {
+                scoreGain = 20; // Standard 20pts per MCQ
+                msg = "Correct! " + activeQuestion.expl;
+                feedback.className = "feedback good";
+                isPass = true;
+            } else {
+                msg = "Incorrect. " + activeQuestion.expl;
+                feedback.className = "feedback bad";
+            }
+        }
+        
+        // --- MATCH CHECK ---
+        else if (stn.type === "match") {
+            const targets = document.querySelectorAll('.drop-target');
+            let correctCount = 0;
+            let total = targets.length;
+            
+            targets.forEach(t => {
+                const filledId = t.dataset.filled;
+                const correctId = t.dataset.correctId;
+                if(filledId === correctId) {
+                    correctCount++;
+                    t.style.border = "2px solid green";
+                } else {
+                    t.style.border = "2px solid red";
+                }
+            });
+            
+            scoreGain = (correctCount / total) * stn.maxScore;
+            msg = `You matched ${correctCount}/${total} correctly.`;
+            feedback.className = scoreGain === stn.maxScore ? "feedback good" : "feedback bad";
+            isPass = correctCount === total;
+        }
+
+        // --- TETRIS CHECK ---
+        else if (stn.type === "tetris") {
+            const vials = document.querySelectorAll('.vial');
+            let correctCount = 0;
+            let total = vials.length;
+            let detailErr = "";
+
+            vials.forEach(v => {
+                const choice = v.dataset.userChoice; // top or bottom
+                const type = v.dataset.type; // freeze_sensitive or heat_sensitive
+                
+                // Logic: Freeze Sensitive MUST go Top. Heat Sensitive MUST go Bottom.
+                let correctZone = (type === 'freeze_sensitive') ? 'top' : 'bottom';
+                
+                if(choice === correctZone) {
+                    correctCount++;
+                    v.classList.add('correct');
+                } else {
+                    v.classList.add('incorrect');
+                    detailErr += `[${v.textContent} should be ${correctZone.toUpperCase()}] `;
+                }
+            });
+
+            scoreGain = (correctCount / total) * stn.maxScore;
+            msg = `You placed ${correctCount}/${total} correctly. ${detailErr}`;
+            feedback.className = scoreGain === stn.maxScore ? "feedback good" : "feedback bad";
+            isPass = correctCount === total;
+        }
+
+        // Finalize Step
+        totalScore += Math.round(scoreGain);
+        feedback.innerHTML = `<strong>Result:</strong> ${msg} <br>Score added: ${Math.round(scoreGain)}`;
+        feedback.style.display = 'block';
+        
+        actionLogs.push({
+            station: stn.title,
+            score: Math.round(scoreGain),
+            max: stn.maxScore || 20,
+            status: isPass ? "Pass" : "Review"
         });
 
-        // Reset UI
-        document.getElementById('feedback-display').style.display = 'none';
-        document.getElementById('next-btn').style.display = 'none';
+        btn.textContent = "Next Station";
         
-        // Re-enable buttons
-        const allBtns = document.querySelectorAll('.btn-option');
-        allBtns.forEach(b => b.disabled = false);
-    }
-
-    function checkAnswer(selectedIndex, clickedBtn) {
-        const data = stations[currentStation];
-        const feedbackEl = document.getElementById('feedback-display');
-        const allBtns = document.querySelectorAll('.btn-option');
-        
-        // Disable all buttons to prevent double answers
-        allBtns.forEach(b => b.disabled = true);
-
-        let isCorrect = (selectedIndex === data.correctIndex);
-        
-        if (isCorrect) {
-            score++;
-            clickedBtn.style.backgroundColor = '#d4efdf';
-            clickedBtn.style.borderColor = '#27ae60';
-            feedbackEl.className = 'feedback-box feedback-correct';
-            feedbackEl.innerHTML = `<strong>Correct!</strong> ${data.feedback}`;
-        } else {
-            clickedBtn.style.backgroundColor = '#fadbd8';
-            clickedBtn.style.borderColor = '#c0392b';
-            feedbackEl.className = 'feedback-box feedback-wrong';
-            feedbackEl.innerHTML = `<strong>Incorrect.</strong> ${data.feedback}`;
-        }
-
-        // Log result
-        userLog.push({
-            station: data.title,
-            result: isCorrect ? "Pass" : "Needs Improvement",
-            note: isCorrect ? "Competency Demonstrated" : "Review Topic"
-        });
-
-        feedbackEl.style.display = 'block';
-        document.getElementById('next-btn').style.display = 'inline-block';
-        
-        // Change button text if it's the last question
-        if(currentStation === stations.length - 1) {
-            document.getElementById('next-btn').textContent = "Finish Mission & View Report";
+        // If last station, change button
+        if(currentStnIndex === STATIONS.length -1) {
+            btn.textContent = "Finish Assessment";
+            btn.onclick = finishGame;
         }
     }
 
-    function nextQuestion() {
-        if (currentStation < stations.length - 1) {
-            currentStation++;
-            loadQuestion();
-        } else {
-            finishGame();
-        }
+    function nextStation() {
+        currentStnIndex++;
+        selectedOptionIndex = -1;
+        loadStation();
     }
 
     function finishGame() {
-        endTime = new Date();
-        const duration = Math.floor((endTime - startTime) / 1000);
-        const min = Math.floor(duration / 60);
-        const sec = duration % 60;
+        document.getElementById('screen-game').classList.remove('active');
+        document.getElementById('screen-report').classList.add('active');
         
-        // Populate Report
-        document.getElementById('report-name').textContent = document.getElementById('studentName').value;
-        document.getElementById('report-roll').textContent = document.getElementById('rollNo').value;
-        document.getElementById('report-time').textContent = `${min} min ${sec} sec`;
-        document.getElementById('report-score').textContent = score;
+        document.getElementById('repName').textContent = document.getElementById('pName').value;
+        document.getElementById('repRoll').textContent = document.getElementById('pRoll').value;
+        document.getElementById('finalScore').textContent = totalScore;
+        document.getElementById('repTime').textContent = document.getElementById('timer').textContent;
 
-        const tbody = document.querySelector('#report-table tbody');
-        tbody.innerHTML = '';
+        const logDiv = document.getElementById('log-container');
+        let html = `<table style="width:100%; border-collapse:collapse; text-align:left; margin-top:20px;">
+            <tr style="background:#ecf0f1;"><th>Station</th><th>Score</th><th>Status</th></tr>`;
         
-        userLog.forEach(log => {
-            const row = `<tr>
-                <td>${log.station}</td>
-                <td style="color: ${log.result === 'Pass' ? 'green' : 'red'}"><strong>${log.result}</strong></td>
-                <td>${log.note}</td>
+        actionLogs.forEach(log => {
+            html += `<tr>
+                <td style="border:1px solid #ddd; padding:8px;">${log.station}</td>
+                <td style="border:1px solid #ddd; padding:8px;">${log.score} / ${log.max}</td>
+                <td style="border:1px solid #ddd; padding:8px; color:${log.status==='Pass'?'green':'red'}">${log.status}</td>
             </tr>`;
-            tbody.innerHTML += row;
         });
-
-        showScreen('report');
+        html += `</table>`;
+        logDiv.innerHTML = html;
     }
-</script>
 
+</script>
 </body>
 </html>
